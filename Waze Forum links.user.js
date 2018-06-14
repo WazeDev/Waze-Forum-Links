@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Waze Forum links
 // @namespace    https://github.com/WazeDev/
-// @version      0.7
+// @version      0.8
 // @description  Add profile and beta links in Waze forum
 // @author       WazeDev
 // @contributor  crazycaveman
@@ -11,7 +11,7 @@
 // @noframes
 // ==/UserScript==
 
-/*global $*/
+/* eslint-env browser, greasemonkey, jquery*/
 
 (function() {
     'use strict';
@@ -53,13 +53,8 @@
     }
 
     function betaLinks() {
-        /*if (!isBetaUser()) {
-            log("Not a beta user.",cl.i);
-            return;
-        }*/
-
         log("Adding beta links",cl.i);
-        let links = $("div.content a[href*=/editor]");
+        let links = $("div.content a[href*='/editor']");
         links.each(function() {
             let url = $(this).attr("href")
             if (url.match(/^https:\/\/(www|beta)\.waze\.com\/(?!user\/)(.{2,6}\/)?editor/) === null) {
@@ -73,7 +68,7 @@
 
     function checkBetaUser() {
         let betaUser = false;
-        let ifrm = $("<iframe id='WUP_iframe'></iframe>", {css:{ "display": "none"}});
+        let ifrm = $("<iframe>").attr("id","WUP_frame").hide();
         ifrm.load(function() { // What to do once the iframe has loaded
             log("iframe loaded", cl.d);
             let memberships = $(this).contents().find("form#ucp div.inner:first ul.cplist a.forumtitle");
@@ -87,7 +82,7 @@
             });
             log(`isBetaUser: ${betaUser}`,cl.d);
             betaLinks();
-            $(this).remove();
+            //$(this).remove();
         });
         ifrm.attr("src", "ucp.php?i=groups");
         $("body").append(ifrm);
@@ -95,16 +90,15 @@
 
     function WMEProfiles() {
         log("Adding editor profile links",cl.i);
-        let links = $("dl.postprofile dt a[href*=memberlist.php]");
+        let links = $("dl.postprofile dt a[href*='memberlist.php']");
         links.each(function() {
             let username = $(this).text();
-            let profileURL = ` (<a href="https://www.waze.com/user/editor/${username}">profile</a>)`;
+            let profileURL = ` (<a target="_blank" href="https://www.waze.com/user/editor/${username}">profile</a>)`;
             $(this).after(profileURL);
         });
     }
 
     function main() {
-        //console.clear()
         if (!( $ && document.readyState === "complete")) {
             log("Document not ready, waiting",cl.d);
             setTimeout(main,500);
