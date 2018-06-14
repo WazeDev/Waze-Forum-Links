@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Waze Forum links
 // @namespace    https://github.com/WazeDev/
-// @version      0.8
+// @version      0.9
 // @description  Add profile and beta links in Waze forum
 // @author       WazeDev
 // @contributor  crazycaveman
@@ -91,6 +91,12 @@
     function WMEProfiles() {
         log("Adding editor profile links",cl.i);
         let links = $("dl.postprofile dt a[href*='memberlist.php']");
+        if (links.length === 0) {
+            links = $("li.row a[href*='memberlist.php']");
+        }
+        if (links.length === 0) {
+            links = $("dl.details dd:first span");
+        }
         links.each(function() {
             let username = $(this).text();
             let profileURL = ` (<a target="_blank" href="https://www.waze.com/user/editor/${username}">profile</a>)`;
