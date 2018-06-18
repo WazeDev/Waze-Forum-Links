@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         Waze Forum links
 // @namespace    https://github.com/WazeDev/
-// @version      0.9
+// @version      1.0
 // @description  Add profile and beta links in Waze forum
 // @author       WazeDev
 // @contributor  crazycaveman
-// @match        https://www.waze.com/forum/*
-// @exclude      https://www.waze.com/forum/ucp.php*
+// @match        https://www.waze.com/forum/
+// @include      /^https:\/\/.*\.waze\.com\/forum\/(?!ucp\.php(?!\?i=(pm|166))).*/
 // @grant        none
 // @noframes
 // ==/UserScript==
@@ -54,12 +54,11 @@
 
     function betaLinks() {
         log("Adding beta links",cl.i);
-        let links = $("div.content a[href*='/editor']");
+        let links = $("div.content a[href*='/editor']").filter(function() {
+            return $(this).attr("href").match(/^https:\/\/www\.waze\.com\/(?!user\/)(.{2,6}\/)?editor/);
+        });
         links.each(function() {
-            let url = $(this).attr("href")
-            if (url.match(/^https:\/\/(www|beta)\.waze\.com\/(?!user\/)(.{2,6}\/)?editor/) === null) {
-                return;
-            }
+            let url = $(this).attr("href");
             let WMEbURL = url.replace("www.","beta.");
             let WMEbAnchor = ` (<a target="_blank" class="postlink" href="${WMEbURL}">&beta;</a>)`;
             $(this).after(WMEbAnchor);
@@ -90,12 +89,15 @@
 
     function WMEProfiles() {
         log("Adding editor profile links",cl.i);
-        let links = $("dl.postprofile dt a[href*='memberlist.php']");
+        let links = $("dl.postprofile dt a[href*='memberlist.php']"); //Post authors
         if (links.length === 0) {
-            links = $("li.row a[href*='memberlist.php']");
+            links = $("li.row a[href*='memberlist.php']"); //Topic lists
         }
         if (links.length === 0) {
-            links = $("dl.details dd:first span");
+            links = $("table.table1 a[href*='memberlist.php']"); //Group member lists
+        }
+        if (links.length === 0) {
+            links = $("dl.details dd:first span"); //Single user forum profile
         }
         links.each(function() {
             let username = $(this).text();
