@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Waze Forum links
 // @namespace    https://github.com/WazeDev/
-// @version      1.0
+// @version      1.1b1
 // @description  Add profile and beta links in Waze forum
 // @author       WazeDev
 // @contributor  crazycaveman
@@ -16,6 +16,8 @@
 (function() {
     'use strict';
 
+    var settings = {};
+    var settingsKey = "WFL_settings";
     var cl = {
         "e": 1,
         "error": 1,
@@ -27,7 +29,7 @@
         "debug": 4,
         "l": 0,
         "log": 0
-    }
+    };
 
     function log(message, level = 0) {
         switch(level) {
@@ -52,6 +54,22 @@
         }
     }
 
+    function saveSettings() {
+        if (!localStorage)
+            return;
+        localStorage.setItem(settingsKey, JSON.stringify(settings));
+    }
+
+    function loadSettings() {
+        if (!localStorage)
+            return;
+        if (localStorage.hasOwnProperty(settingsKey)) {
+            settings = JSON.parse(localStorage.getItem(settingsKey));
+        } else {
+            settings.beta = {value: false, updated: 0};
+        }
+    }
+
     function betaLinks() {
         log("Adding beta links",cl.i);
         let links = $("div.content a[href*='/editor']").filter(function() {
@@ -67,24 +85,32 @@
 
     function checkBetaUser() {
         let betaUser = false;
-        let ifrm = $("<iframe>").attr("id","WUP_frame").hide();
-        ifrm.load(function() { // What to do once the iframe has loaded
-            log("iframe loaded", cl.d);
-            let memberships = $(this).contents().find("form#ucp div.inner:first ul.cplist a.forumtitle");
-            memberships.each(function() {
-                let group = $(this).text();
-                log(group, cl.d);
-                if (group === "WME beta testers") {
-                    betaUser = true;
-                    return false; //Force end of each callback
-                }
-            });
-            log(`isBetaUser: ${betaUser}`,cl.d);
+        let d = new Date();
+        if (settings.beta.value) {
             betaLinks();
-            //$(this).remove();
-        });
-        ifrm.attr("src", "ucp.php?i=groups");
-        $("body").append(ifrm);
+        }
+        else if (parseInt(settings.beta.updated) + 7 < parseInt(d.getFullYear() + ("0" + d.getMonth()).slice(-2) + ("0" + d.getDate()).slice(-2))) {
+            let ifrm = $("<iframe>").attr("id","WUP_frame").hide();
+            ifrm.load(function() { // What to do once the iframe has loaded
+                log("iframe loaded", cl.d);
+                let memberships = $(this).contents().find("form#ucp div.inner:first ul.cplist a.forumtitle");
+                memberships.each(function() {
+                    let group = $(this).text();
+                    log(group, cl.d);
+                    if (group === "WME beta testers") {
+                        betaUser = true;
+                        betaLinks();
+                        return false; //Force end of each callback
+                    }
+                });
+                log(`isBetaUser: ${betaUser}`,cl.d);
+                settings.beta = {value: betaUser, updated: d.getFullYear() + ("0" + d.getMonth()).slice(-2) + ("0" + d.getDate()).slice(-2)};
+                //$(this).remove(); //Remove frame
+                saveSettings();
+            });
+            ifrm.attr("src", "ucp.php?i=groups");
+            $("body").append(ifrm);
+        }
     }
 
     function WMEProfiles() {
@@ -114,6 +140,7 @@
         }
         console.group("WMEFL");
         log("Loading",cl.i);
+        loadSettings();
         WMEProfiles();
         checkBetaUser();
         log("Done",cl.i);
