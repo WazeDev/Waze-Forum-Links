@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Waze Forum links
 // @namespace    https://github.com/WazeDev/
-// @version      1.1b1
+// @version      1.1
 // @description  Add profile and beta links in Waze forum
 // @author       WazeDev
 // @contributor  crazycaveman
@@ -11,7 +11,7 @@
 // @noframes
 // ==/UserScript==
 
-/* eslint-env browser, greasemonkey, jquery*/
+/* global $ */
 
 (function() {
     'use strict';
@@ -55,18 +55,28 @@
     }
 
     function saveSettings() {
-        if (!localStorage)
+        if (!localStorage) {
             return;
+        }
         localStorage.setItem(settingsKey, JSON.stringify(settings));
     }
 
     function loadSettings() {
-        if (!localStorage)
+        let defaults = {
+            beta: {value: false, updated: 0}
+        };
+        if (!localStorage) {
             return;
+        }
         if (localStorage.hasOwnProperty(settingsKey)) {
             settings = JSON.parse(localStorage.getItem(settingsKey));
         } else {
-            settings.beta = {value: false, updated: 0};
+            settings = defaults;
+        }
+        for (let prop in defaults) {
+            if (defaults.hasOwnProperty(prop) && !settings.hasOwnProperty(prop)) {
+                settings[prop] = defaults[prop];
+            }
         }
     }
 
@@ -87,6 +97,7 @@
         let betaUser = false;
         let d = new Date();
         if (settings.beta.value) {
+            log("Beta status stored", cl.d);
             betaLinks();
         }
         else if (parseInt(settings.beta.updated) + 7 < parseInt(d.getFullYear() + ("0" + d.getMonth()).slice(-2) + ("0" + d.getDate()).slice(-2))) {
