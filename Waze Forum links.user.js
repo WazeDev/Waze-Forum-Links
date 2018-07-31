@@ -13,44 +13,44 @@
 
 /* global $ */
 
-(function() {
+(function () {
     'use strict';
 
     var settings = {};
-    var settingsKey = "WFL_settings";
+    var settingsKey = 'WFL_settings';
     var cl = {
-        "e": 1,
-        "error": 1,
-        "w": 2,
-        "warn": 2,
-        "i": 3,
-        "info": 3,
-        "d": 4,
-        "debug": 4,
-        "l": 0,
-        "log": 0
+        e: 1,
+        error: 1,
+        w: 2,
+        warn: 2,
+        i: 3,
+        info: 3,
+        d: 4,
+        debug: 4,
+        l: 0,
+        log: 0,
     };
 
     function log(message, level = 0) {
-        switch(level) {
-            case 1:
-            case "error":
-                console.error("WFL: " + message);
-                break;
-            case 2:
-            case "warn":
-                console.warn("WFL: " + message);
-                break;
-            case 3:
-            case "info":
-                console.info("WFL: " + message);
-                break;
-            case 4:
-            case "debug":
-                console.debug("WFL: " + message);
-                break;
-            default:
-                console.log("WFL: " + message);
+        switch (level) {
+        case 1:
+        case 'error':
+            console.error('WFL: ', message);
+            break;
+        case 2:
+        case 'warn':
+            console.warn('WFL: ', message);
+            break;
+        case 3:
+        case 'info':
+            console.info('WFL: ', message);
+            break;
+        case 4:
+        case 'debug':
+            console.debug('WFL: ', message);
+            break;
+        default:
+            console.log('WFL: ', message);
         }
     }
 
@@ -63,33 +63,32 @@
 
     function loadSettings() {
         let defaults = {
-            beta: {value: false, updated: 0}
+            beta: { value: false, updated: 0 },
         };
         if (!localStorage) {
             return;
         }
-        if (localStorage.hasOwnProperty(settingsKey)) {
+        if (Object.prototype.hasOwnProperty.call(localStorage, settingsKey)) {
             settings = JSON.parse(localStorage.getItem(settingsKey));
         } else {
             settings = defaults;
         }
-        for (let prop in defaults) {
-            if (defaults.hasOwnProperty(prop) && !settings.hasOwnProperty(prop)) {
+        Object.keys(defaults).forEach((prop) => {
+            if (Object.prototype.hasOwnProperty.call(defaults, prop)
+            && !Object.prototype.hasOwnProperty.call(settings, prop)) {
                 settings[prop] = defaults[prop];
             }
-        }
+        });
     }
 
     function betaLinks() {
-        log("Adding beta links",cl.i);
-        let links = $("div.content a[href*='/editor']").filter(function() {
-            return $(this).attr("href").match(/^https:\/\/www\.waze\.com\/(?!user\/)(.{2,6}\/)?editor/);
-        });
-        links.each(function() {
-            let url = $(this).attr("href");
-            let WMEbURL = url.replace("www.","beta.");
+        log('Adding beta links', cl.i);
+        let links = $("div.content a[href*='/editor']").filter((i, elem) => $(elem).attr('href').match(/^https:\/\/www\.waze\.com\/(?!user\/)(.{2,6}\/)?editor/));
+        links.each((i, elem) => {
+            let url = $(elem).attr('href');
+            let WMEbURL = url.replace('www.', 'beta.');
             let WMEbAnchor = ` (<a target="_blank" class="postlink" href="${WMEbURL}">&beta;</a>)`;
-            $(this).after(WMEbAnchor);
+            $(elem).after(WMEbAnchor);
         });
     }
 
@@ -97,35 +96,39 @@
         let betaUser = false;
         let d = new Date();
         if (settings.beta.value) {
-            log("Beta status stored", cl.d);
+            log('Beta status stored', cl.d);
             betaLinks();
-        }
-        else if (parseInt(settings.beta.updated) + 7 < parseInt(d.getFullYear() + ("0" + d.getMonth()).slice(-2) + ("0" + d.getDate()).slice(-2))) {
-            let ifrm = $("<iframe>").attr("id","WUP_frame").hide();
-            ifrm.load(function() { // What to do once the iframe has loaded
-                log("iframe loaded", cl.d);
-                let memberships = $(this).contents().find("form#ucp div.inner:first ul.cplist a.forumtitle");
-                memberships.each(function() {
-                    let group = $(this).text();
+        } else if (parseInt(settings.beta.updated, 10) + 7
+                < parseInt(d.getFullYear() + (`0${d.getMonth()}`).slice(-2) + (`0${d.getDate()}`).slice(-2), 10)) {
+            let ifrm = $('<iframe>').attr('id', 'WUP_frame').hide();
+            ifrm.load((event) => { // What to do once the iframe has loaded
+                log('iframe loaded', cl.d);
+                let memberships = $(event.currentTarget).contents().find('form#ucp div.inner:first ul.cplist a.forumtitle');
+                memberships.each(() => {
+                    let group = $(event.currentTarget).text();
                     log(group, cl.d);
-                    if (group === "WME beta testers") {
+                    if (group === 'WME beta testers') {
                         betaUser = true;
                         betaLinks();
                         return false; //Force end of each callback
                     }
+                    return true;
                 });
-                log(`isBetaUser: ${betaUser}`,cl.d);
-                settings.beta = {value: betaUser, updated: d.getFullYear() + ("0" + d.getMonth()).slice(-2) + ("0" + d.getDate()).slice(-2)};
+                log(`isBetaUser: ${betaUser}`, cl.d);
+                settings.beta = {
+                    value: betaUser,
+                    updated: d.getFullYear() + (`0${d.getMonth()}`).slice(-2) + (`0${d.getDate()}`).slice(-2),
+                };
                 //$(this).remove(); //Remove frame
                 saveSettings();
             });
-            ifrm.attr("src", "ucp.php?i=groups");
-            $("body").append(ifrm);
+            ifrm.attr('src', 'ucp.php?i=groups');
+            $('body').append(ifrm);
         }
     }
 
     function WMEProfiles() {
-        log("Adding editor profile links",cl.i);
+        log('Adding editor profile links', cl.i);
         let links = $("dl.postprofile dt a[href*='memberlist.php']"); //Post authors
         if (links.length === 0) {
             links = $("li.row a[href*='memberlist.php']"); //Topic lists
@@ -134,29 +137,29 @@
             links = $("table.table1 a[href*='memberlist.php']"); //Group member lists
         }
         if (links.length === 0) {
-            links = $("dl.details dd:first span"); //Single user forum profile
+            links = $('dl.details dd:first span'); //Single user forum profile
         }
-        links.each(function() {
-            let username = $(this).text();
+        links.each((i, elem) => {
+            let username = $(elem).text();
             let profileURL = ` (<a target="_blank" href="https://www.waze.com/user/editor/${username}">profile</a>)`;
-            $(this).after(profileURL);
+            $(elem).after(profileURL);
         });
     }
 
     function main() {
-        if (!( $ && document.readyState === "complete")) {
-            log("Document not ready, waiting",cl.d);
-            setTimeout(main,500);
+        if (!($ && document.readyState === 'complete')) {
+            log('Document not ready, waiting', cl.d);
+            setTimeout(main, 500);
             return;
         }
-        console.group("WMEFL");
-        log("Loading",cl.i);
+        console.group('WMEFL');
+        log('Loading', cl.i);
         loadSettings();
         WMEProfiles();
         checkBetaUser();
-        log("Done",cl.i);
-        console.groupEnd("WMEFL");
+        log('Done', cl.i);
+        console.groupEnd('WMEFL');
     }
 
-    setTimeout(main,500);
-})();
+    setTimeout(main, 500);
+}());
