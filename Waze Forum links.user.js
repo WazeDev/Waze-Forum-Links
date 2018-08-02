@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Waze Forum links
 // @namespace    https://github.com/WazeDev/
-// @version      1.1
+// @version      1.1.1
 // @description  Add profile and beta links in Waze forum
 // @author       WazeDev
 // @contributor  crazycaveman
-// @match        https://www.waze.com/forum/
+// @include      https://www.waze.com/forum/
 // @include      /^https:\/\/.*\.waze\.com\/forum\/(?!ucp\.php(?!\?i=(pm|166))).*/
 // @grant        none
 // @noframes
@@ -134,7 +134,7 @@
             links = $("li.row a[href*='memberlist.php']"); //Topic lists
         }
         if (links.length === 0) {
-            links = $("table.table1 a[href*='memberlist.php']"); //Group member lists
+            links = $("table.table1 tbody a[href*='memberlist.php']"); //Group member lists
         }
         if (links.length === 0) {
             links = $('dl.details dd:first span'); //Single user forum profile
