@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Waze Forum links
 // @namespace    https://github.com/WazeDev/
-// @version      1.1.1
+// @version      2019.04.04.01
 // @description  Add profile and beta links in Waze forum
 // @author       WazeDev
 // @contributor  crazycaveman
@@ -17,8 +17,8 @@
     'use strict';
 
     var settings = {};
-    var settingsKey = 'WFL_settings';
-    var cl = {
+    const settingsKey = 'WFL_settings';
+    const cl = {
         e: 1,
         error: 1,
         w: 2,
@@ -129,7 +129,7 @@
 
     function WMEProfiles() {
         log('Adding editor profile links', cl.i);
-        let links = $("dl.postprofile dt a[href*='memberlist.php']"); //Post authors
+        let links = $("p.author a[href*='memberlist.php'], dl.postprofile dt a[href*='memberlist.php']"); //Post authors
         if (links.length === 0) {
             links = $("li.row a[href*='memberlist.php']"); //Topic lists
         }
@@ -146,10 +146,13 @@
         });
     }
 
-    function main() {
-        if (!($ && document.readyState === 'complete')) {
+    function main(tries = 1) {
+        if (tries >= 10) {
+            log('Giving up on loading', cl.w);
+            return;
+        } else if (!($ && document.readyState === 'complete')) {
             log('Document not ready, waiting', cl.d);
-            setTimeout(main, 500);
+            setTimeout(main, 500, tries + 1);
             return;
         }
         console.group('WMEFL');
@@ -161,5 +164,5 @@
         console.groupEnd('WMEFL');
     }
 
-    setTimeout(main, 500);
+    main();
 }());
