@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Waze Forum links
 // @namespace    https://github.com/WazeDev/
-// @version      2019.04.04.01
+// @version      2019.04.05
 // @description  Add profile and beta links in Waze forum
 // @author       WazeDev
 // @contributor  crazycaveman
@@ -83,7 +83,9 @@
 
     function betaLinks() {
         log('Adding beta links', cl.i);
-        let links = $("div.content a[href*='/editor']").filter((i, elem) => $(elem).attr('href').match(/^https:\/\/www\.waze\.com\/(?!user\/)(.{2,6}\/)?editor/));
+        let links = $("div.content a[href*='/editor']").filter(function(i, elem) {
+            return $(this).attr('href').match(/^https:\/\/www\.waze\.com\/(?!user\/)(.{2,6}\/)?editor/);
+        });
         links.each((i, elem) => {
             let url = $(elem).attr('href');
             let WMEbURL = url.replace('www.', 'beta.');
@@ -103,18 +105,10 @@
             let ifrm = $('<iframe>').attr('id', 'WUP_frame').hide();
             ifrm.load((event) => { // What to do once the iframe has loaded
                 log('iframe loaded', cl.d);
-                let memberships = $(event.currentTarget).contents().find('form#ucp div.inner:first ul.cplist a.forumtitle');
-                memberships.each(() => {
-                    let group = $(event.currentTarget).text();
-                    log(group, cl.d);
-                    if (group === 'WME beta testers') {
-                        betaUser = true;
-                        betaLinks();
-                        return false; //Force end of each callback
-                    }
-                    return true;
-                });
+                let memberships = $(event.currentTarget).contents().find('form#ucp div.inner:first ul.cplist a.forumtitle').text();
+                betaUser = memberships.indexOf('WME beta testers') >= 0;
                 log(`isBetaUser: ${betaUser}`, cl.d);
+                betaUser && betaLinks();
                 settings.beta = {
                     value: betaUser,
                     updated: d.getFullYear() + (`0${d.getMonth()}`).slice(-2) + (`0${d.getDate()}`).slice(-2),
