@@ -1,13 +1,14 @@
 // ==UserScript==
 // @name         Waze Forum links
 // @namespace    https://github.com/WazeDev/
-// @version      2019.04.05
+// @version      2021.02.28
 // @description  Add profile and beta links in Waze forum
 // @author       WazeDev
 // @contributor  crazycaveman
 // @include      https://www.waze.com/forum/
 // @include      /^https:\/\/.*\.waze\.com\/forum\/(?!ucp\.php(?!\?i=(pm|166))).*/
 // @grant        none
+// @require      https://code.jquery.com/jquery-2.2.4.min.js
 // @noframes
 // ==/UserScript==
 
