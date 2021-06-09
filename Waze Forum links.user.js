@@ -1,14 +1,15 @@
 // ==UserScript==
-// @name         Waze Forum links
-// @namespace    https://github.com/WazeDev/
-// @version      2021.06.09
-// @description  Add profile and beta links in Waze forum
-// @author       WazeDev
-// @contributor  crazycaveman
-// @include      https://www.waze.com/forum/
-// @include      /^https:\/\/.*\.waze\.com\/forum\/(?!ucp\.php(?!\?i=(pm|166))).*/
-// @grant        none
-// @require      https://code.jquery.com/jquery-2.2.4.min.js
+// @name            Waze Forum links
+// @namespace       https://github.com/WazeDev/
+// @version         2021.06.09.01
+// @description     Add profile and beta links in Waze forum
+// @author          WazeDev
+// @contributor     crazycaveman
+// @contributionURL https://github.com/WazeDev/Thank-The-Authors
+// @include         https://www.waze.com/forum/
+// @include         /^https:\/\/.*\.waze\.com\/forum\/(?!ucp\.php(?!\?i=(pm|166))).*/
+// @grant           none
+// @require         https://code.jquery.com/jquery-2.2.4.min.js
 // @noframes
 // ==/UserScript==
 
@@ -106,7 +107,7 @@
             let ifrm = $('<iframe>').attr('id', 'WUP_frame').hide();
             ifrm.load((event) => { // What to do once the iframe has loaded
                 log('iframe loaded', cl.d);
-                let memberships = $(event.currentTarget).contents().find('form#ucp div.inner:first ul.cplist a.forumtitle').text();
+                let memberships = $(event.currentTarget).contents().find('form#ucp section:first ul.cplist a.forumtitle').text();
                 betaUser = memberships.indexOf('WME beta testers') >= 0;
                 log(`isBetaUser: ${betaUser}`, cl.d);
                 betaUser && betaLinks();
@@ -124,7 +125,7 @@
 
     function WMEProfiles() {
         log('Adding editor profile links', cl.i);
-        let links = $("p.author a[href*='memberlist.php'], dl.postprofile dt a[href*='memberlist.php']"); //Post authors
+        let links = $("div.author a[href*='memberlist.php'], dl.postprofile dt a[href*='memberlist.php']"); //Post authors
         if (links.length === 0) {
             links = $("li.row a[href*='memberlist.php']"); //Topic lists
         }
@@ -132,7 +133,7 @@
             links = $("table.table1 tbody a[href*='memberlist.php']"); //Group member lists
         }
         if (links.length === 0) {
-            links = $('dl.details dd:first span'); //Single user forum profile
+            links = $('div.memberlist-title'); //Single user forum profile
         }
         links.each((i, elem) => {
             let username = $(elem).text();
