@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Waze Forum links
 // @namespace    https://github.com/WazeDev/
-// @version      2021.02.28
+// @version      2021.06.09
 // @description  Add profile and beta links in Waze forum
 // @author       WazeDev
 // @contributor  crazycaveman
@@ -84,12 +84,12 @@
 
     function betaLinks() {
         log('Adding beta links', cl.i);
-        let links = $("div.content a[href*='/editor']").filter(function(i, elem) {
-            return $(this).attr('href').match(/^https:\/\/www\.waze\.com\/(?!user\/)(.{2,6}\/)?editor/);
+        let links = $("div.page-body a[href*='/editor']").filter(function(i, elem) {
+            return $(this).attr('href').match(/^https:\/\/(www\.)?waze\.com\/(?!user\/)(.{2,6}\/)?editor/);
         });
         links.each((i, elem) => {
             let url = $(elem).attr('href');
-            let WMEbURL = url.replace('www.', 'beta.');
+            let WMEbURL = url.replace(/(www\.)?waze\.com/, 'beta.waze.com');
             let WMEbAnchor = ` (<a target="_blank" class="postlink" href="${WMEbURL}">&beta;</a>)`;
             $(elem).after(WMEbAnchor);
         });
