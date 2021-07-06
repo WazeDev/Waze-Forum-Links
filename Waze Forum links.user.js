@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            Waze Forum links
 // @namespace       https://github.com/WazeDev/
-// @version         2021.06.14.01
+// @version         2021.07.06.01
 // @description     Add profile and beta links in Waze forum
 // @author          WazeDev
 // @contributor     crazycaveman
@@ -175,7 +175,9 @@
         });
 
         // Change My Posts link to display topics (same as View Your Posts in old forum)
-        $('#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel > wz-user-box > wz-menu-item:nth-child(5) > a').attr('href', 'https://www.waze.com/forum/search.php?author_id=16831039&sr=topics');
+        $('#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel > wz-user-box > wz-menu-item:nth-child(5) > a').attr('href', function(i,link) {
+            return link.replace(/sr=posts/,'sr=topics');
+        });
 
         // Copy forum path to bottom of page
         //let topicLink = $('#control_bar_handler > div.wrap').clone();
@@ -196,12 +198,12 @@
     }
 
     function main(tries = 1) {
-        if (tries >= 15) {
+        if (tries >= 20) {
             log('Giving up on loading', cl.w);
             return;
         } else if (!($ && document.readyState === 'complete')) {
             log('Document not ready, waiting', cl.d);
-            setTimeout(main, 100, tries + 1);
+            setTimeout(main, 250, tries + 1);
             return;
         }
         console.group('WMEFL');
