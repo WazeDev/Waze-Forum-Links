@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            Waze Forum links
 // @namespace       https://github.com/WazeDev/
-// @version         2021.07.06.01
+// @version         2021.07.06.02
 // @description     Add profile and beta links in Waze forum
 // @author          WazeDev
 // @contributor     crazycaveman
@@ -142,26 +142,36 @@
         });
     }
 
-    function haveNotifications() {
-       const numNotifications = $('#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel > wz-user-box > wz-menu-item:nth-child(4) > a > strong').text();
+    function SDGNewForumFixes() {
+        // Create wrapper in header
+        const FLWrapper = `<div id='FL-Wrapper'></div>`;
+        $('#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel').prepend(FLWrapper);
 
+        // Create notification icon in header
+        const numNotifications = $('#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel > wz-user-box > wz-menu-item:nth-child(4) > a > strong').text();
         if (parseInt(numNotifications) > 0) {
-            $('#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel').prepend(
-                `<span id='WFL-Notifications'><a href='https://www.waze.com/forum/ucp.php?i=ucp_notifications' style='text-decoration:none;color:black;'>${numNotifications}</a></span>`
+            $('#FL-Wrapper').prepend(
+                `<span id='FL-Notifications'><a href='https://www.waze.com/forum/ucp.php?i=ucp_notifications' style='text-decoration:none;color:black;'>${numNotifications}</a></span>`
             );
-            $('#WFL-Notifications').css({
+            $('#FL-Notifications').css({
                 'float': 'left',
                 'margin-right': '80px',
                 'padding': '0px 10px',
                 'border': '2px solid black',
                 'border-radius': '50%',
-                'background-color': '#40ff00',
+                'background-color': '#33ccff',
                 'font-size': '18px'
             });
+            $('#FL-Notifications > a').css({ 'color': 'white' });
         }
-    }
 
-    function SDGNewForumFixes() {
+        // Add Moderator CP link to header (no way to verify if they have access or not that I know off)
+        // const MCP = `
+        //     <span style='padding:0 3px;'><a href="./mcp.php?i=main&amp;mode=front" title="Moderator Control Panel" role="menuitem">
+		// 		<i class="icon fa-gavel fa-fw" aria-hidden="true" style='color:#3c4043;'></i>
+		//	</a></span>`;
+        // $('#FL-Wrapper').prepend(MCP);
+
         // Re-enable memberlist button in dropdown
         const $MemberList =
             `<wz-menu-item >
@@ -170,14 +180,24 @@
                 </a>
             </wz-menu-item>`;
         $('#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel > wz-user-box > wz-menu-item:nth-child(6)').after($MemberList);
-        $("#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel > wz-user-box > wz-menu-item:nth-child(7) > a").click(function() {
+        $("#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel > wz-user-box > wz-menu-item:nth-child(8) > a").click(function() {
             window.location = './memberlist.php';
         });
 
-        // Change My Posts link to display topics (same as View Your Posts in old forum)
-        $('#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel > wz-user-box > wz-menu-item:nth-child(5) > a').attr('href', function(i,link) {
-            return link.replace(/sr=posts/,'sr=topics');
+        // Add link to usergroups page to dropdown
+        const $UserGroups =
+            `<wz-menu-item >
+                <a class="no-blue-link" href="https://www.waze.com/forum/ucp.php?i=167" title="Usergroups" role="menuitem">
+                    <i class="icon fa-group fa-fw"></i><span>Usergroups</span>
+                </a>
+            </wz-menu-item>`;
+        $('#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel > wz-user-box > wz-menu-item:nth-child(6)').after($UserGroups);
+        $("#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel > wz-user-box > wz-menu-item:nth-child(7) > a").click(function() {
+            window.location = 'https://www.waze.com/forum/ucp.php?i=167';
         });
+
+        // Change My Posts link to display topics (same as View Your Posts in old forum)
+        $('#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel > wz-user-box > wz-menu-item:nth-child(5) > a').attr('href', 'https://www.waze.com/forum/search.php?author_id=16831039&sr=topics');
 
         // Copy forum path to bottom of page
         //let topicLink = $('#control_bar_handler > div.wrap').clone();
@@ -195,6 +215,32 @@
         $($newli.find('span')[0]).text('Send PM');
         $($newli.find('span')[0]).css('padding-left', '5px');
         $('#page-body > main > aside > ul').prepend($newli);
+
+        // Change the usergroup list to a select again...
+        $('#members-groups-list').hide();
+        $('#users-group-links').css('display', 'inline-block');
+        $('#users-group-links > wz-select').css('display', 'inline-block');
+        $('#users-group-links > button').css('display', 'inline-block');
+        $('#users-group-links > button').text('Go');
+
+        // Fix the select when managing groups
+        const userSelect = $('#page-header > fieldset.display-actions > select').get();
+        $(userSelect).append($('<option>', {
+            value: 'default',
+            text: 'Make group default for member'
+        }));
+        $(userSelect).append($('<option>', {
+            value: 'approve',
+            text: 'Approve member'
+        }));
+        $(userSelect).append($('<option>', {
+            value: 'deleteusers',
+            text: 'Remove member from group'
+        }));
+
+        // Put the "leave shadow topic" and "lock topic" options back on the move topic page
+        $('fieldset dd').css('margin-left', '5%');
+        $('dd label').css('white-space', 'normal');
     }
 
     function main(tries = 1) {
@@ -211,7 +257,6 @@
         loadSettings();
         WMEProfiles();
         checkBetaUser();
-        haveNotifications();
         SDGNewForumFixes();
         log('Done', cl.i);
         console.groupEnd('WMEFL');
