@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            Waze Forum links
 // @namespace       https://github.com/WazeDev/
-// @version         2021.07.06.02
+// @version         2021.09.03.01
 // @description     Add profile and beta links in Waze forum
 // @author          WazeDev
 // @contributor     crazycaveman
@@ -166,11 +166,11 @@
         }
 
         // Add Moderator CP link to header (no way to verify if they have access or not that I know off)
-        // const MCP = `
-        //     <span style='padding:0 3px;'><a href="./mcp.php?i=main&amp;mode=front" title="Moderator Control Panel" role="menuitem">
-		// 		<i class="icon fa-gavel fa-fw" aria-hidden="true" style='color:#3c4043;'></i>
-		//	</a></span>`;
-        // $('#FL-Wrapper').prepend(MCP);
+        //const MCP = `
+        //    <span style='padding:0 3px;'><a href="./mcp.php?i=main&amp;mode=front" title="Moderator Control Panel" role="menuitem">
+	//			<i class="icon fa-gavel fa-fw" aria-hidden="true" style='color:#3c4043;'></i>
+	//		</a></span>`;
+        //$('#FL-Wrapper').prepend(MCP);
 
         // Re-enable memberlist button in dropdown
         const $MemberList =
@@ -200,8 +200,10 @@
         $('#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel > wz-user-box > wz-menu-item:nth-child(5) > a').attr('href', 'https://www.waze.com/forum/search.php?author_id=16831039&sr=topics');
 
         // Copy forum path to bottom of page
-        //let topicLink = $('#control_bar_handler > div.wrap').clone();
-        // $('#page-body > div.d-flex.justify-space-between.mb-5').before(topicLink);
+//         let topicLink = $('#nav-breadcrumbs').clone();
+//         topicLink[0].id = 'nav-breadcrumbs-bottom';
+//         console.log(topicLink[0]);
+//         $('.action-bar bar-bottom').prepend(topicLink[0]);
 
         // Move 'New' icon to front of text in notification page
         $("#ucp > section > div.notifications-list > ul.cplist.two-columns > li > div.ml-6 > a > div > wz-badge").each(function() {
@@ -222,6 +224,7 @@
         $('#users-group-links > wz-select').css('display', 'inline-block');
         $('#users-group-links > button').css('display', 'inline-block');
         $('#users-group-links > button').text('Go');
+        $('#users-group-links > wz-select').css('width', '250px')
 
         // Fix the select when managing groups
         const userSelect = $('#page-header > fieldset.display-actions > select').get();
@@ -241,15 +244,19 @@
         // Put the "leave shadow topic" and "lock topic" options back on the move topic page
         $('fieldset dd').css('margin-left', '5%');
         $('dd label').css('white-space', 'normal');
+
+        // Remove excess space in post actions menu for moderator functions
+        $('.post-buttons .dropdown a').css('margin-bottom', '0px');
+        $('.dropdown-contents a, .dropdown-contents li.dropdown-label').css('padding', '10px 10px 10px 0');
     }
 
     function main(tries = 1) {
-        if (tries >= 20) {
+        if (tries >= 10) {
             log('Giving up on loading', cl.w);
             return;
         } else if (!($ && document.readyState === 'complete')) {
             log('Document not ready, waiting', cl.d);
-            setTimeout(main, 250, tries + 1);
+            setTimeout(main, 500, tries + 1);
             return;
         }
         console.group('WMEFL');
