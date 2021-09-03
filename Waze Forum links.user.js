@@ -250,6 +250,7 @@
             'margin-bottom': '0px',
             'padding-left': '0px'
         });
+	$('.dropdown-contents a, .dropdown-contents').css('padding-left', '10px');
         $('#phpbb .postbody .post-buttons .dropdown-container .dropdown-contents li').css('padding-left', '5px');
         $('.dropdown-contents a, .dropdown-contents li.dropdown-label').css('padding', '10px 10px 10px 0px');
     }
