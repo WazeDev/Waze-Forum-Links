@@ -166,11 +166,11 @@
         }
 
         // Add Moderator CP link to header (no way to verify if they have access or not that I know off)
-        //const MCP = `
-        //    <span style='padding:0 3px;'><a href="./mcp.php?i=main&amp;mode=front" title="Moderator Control Panel" role="menuitem">
-	//			<i class="icon fa-gavel fa-fw" aria-hidden="true" style='color:#3c4043;'></i>
-	//		</a></span>`;
-        //$('#FL-Wrapper').prepend(MCP);
+        const MCP = `
+            <span style='padding:0 3px;'><a href="./mcp.php?i=main&amp;mode=front" title="Moderator Control Panel" role="menuitem">
+				<i class="icon fa-gavel fa-fw" aria-hidden="true" style='color:#3c4043;'></i>
+			</a></span>`;
+        $('#FL-Wrapper').prepend(MCP);
 
         // Re-enable memberlist button in dropdown
         const $MemberList =
@@ -246,8 +246,12 @@
         $('dd label').css('white-space', 'normal');
 
         // Remove excess space in post actions menu for moderator functions
-        $('.post-buttons .dropdown a').css('margin-bottom', '0px');
-        $('.dropdown-contents a, .dropdown-contents li.dropdown-label').css('padding', '10px 10px 10px 0');
+        $('.post-buttons .dropdown a').css({
+            'margin-bottom': '0px',
+            'padding-left': '0px'
+        });
+        $('#phpbb .postbody .post-buttons .dropdown-container .dropdown-contents li').css('padding-left', '5px');
+        $('.dropdown-contents a, .dropdown-contents li.dropdown-label').css('padding', '10px 10px 10px 0px');
     }
 
     function main(tries = 1) {
