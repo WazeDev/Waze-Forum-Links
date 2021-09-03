@@ -166,11 +166,11 @@
         }
 
         // Add Moderator CP link to header (no way to verify if they have access or not that I know off)
-        const MCP = `
-            <span style='padding:0 3px;'><a href="./mcp.php?i=main&amp;mode=front" title="Moderator Control Panel" role="menuitem">
-				<i class="icon fa-gavel fa-fw" aria-hidden="true" style='color:#3c4043;'></i>
-			</a></span>`;
-        $('#FL-Wrapper').prepend(MCP);
+        //const MCP = `
+        //    <span style='padding:0 3px;'><a href="./mcp.php?i=main&amp;mode=front" title="Moderator Control Panel" role="menuitem">
+	//			<i class="icon fa-gavel fa-fw" aria-hidden="true" style='color:#3c4043;'></i>
+	//		</a></span>`;
+        //$('#FL-Wrapper').prepend(MCP);
 
         // Re-enable memberlist button in dropdown
         const $MemberList =
