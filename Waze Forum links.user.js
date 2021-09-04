@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            Waze Forum links
 // @namespace       https://github.com/WazeDev/
-// @version         2021.09.03.01
+// @version         2021.09.04.01
 // @description     Add profile and beta links in Waze forum
 // @author          WazeDev
 // @contributor     crazycaveman
@@ -165,12 +165,13 @@
             $('#FL-Notifications > a').css({ 'color': 'white' });
         }
 
-        // Add Moderator CP link to header (no way to verify if they have access or not that I know off)
-        //const MCP = `
-        //    <span style='padding:0 3px;'><a href="./mcp.php?i=main&amp;mode=front" title="Moderator Control Panel" role="menuitem">
-	//			<i class="icon fa-gavel fa-fw" aria-hidden="true" style='color:#3c4043;'></i>
-	//		</a></span>`;
-        //$('#FL-Wrapper').prepend(MCP);
+        // Move 'New' icon to front of text in notification page
+        $("#ucp > section > div.notifications-list > ul.cplist.two-columns > li > div.ml-6 > a > div > wz-badge").each(function() {
+            $(this).parent().prepend(this);
+        });
+
+        // Change My Posts link to display topics (same as View Your Posts in old forum)
+        $('#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel > wz-user-box > wz-menu-item:nth-child(5) > a').attr('href', 'https://www.waze.com/forum/search.php?author_id=16831039&sr=topics');
 
         // Re-enable memberlist button in dropdown
         const $MemberList =
@@ -196,19 +197,7 @@
             window.location = 'https://www.waze.com/forum/ucp.php?i=167';
         });
 
-        // Change My Posts link to display topics (same as View Your Posts in old forum)
-        $('#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel > wz-user-box > wz-menu-item:nth-child(5) > a').attr('href', 'https://www.waze.com/forum/search.php?author_id=16831039&sr=topics');
-
-        // Copy forum path to bottom of page
-//         let topicLink = $('#nav-breadcrumbs').clone();
-//         topicLink[0].id = 'nav-breadcrumbs-bottom';
-//         console.log(topicLink[0]);
-//         $('.action-bar bar-bottom').prepend(topicLink[0]);
-
-        // Move 'New' icon to front of text in notification page
-        $("#ucp > section > div.notifications-list > ul.cplist.two-columns > li > div.ml-6 > a > div > wz-badge").each(function() {
-            $(this).parent().prepend(this);
-        });
+        /****** USER PROFILE PAGE ELEMENT FIXES AND ADDTITIONS ******/
 
         // Move link to PM a user to the top left of the user page
         let $newli = $('#page-body > main > aside > ul > li:nth-child(2)').clone();
@@ -226,6 +215,8 @@
         $('#users-group-links > button').text('Go');
         $('#users-group-links > wz-select').css('width', '250px')
 
+        /****** UCP USERGROUP TAB FIXES ******/
+
         // Fix the select when managing groups
         const userSelect = $('#page-header > fieldset.display-actions > select').get();
         $(userSelect).append($('<option>', {
@@ -241,6 +232,27 @@
             text: 'Remove member from group'
         }));
 
+        // Fix spacing of text for usergroup descriptions and types
+        $('#cp-main').css('max-width', '90%');
+        $('.groups-row-wrp').css({
+            'width': '80%'
+        });
+        $('.groups-row-wrp > div > span').css({
+            'display': 'block'
+        });
+        $('.row-wrp > wz-radio-button > span').css({
+            'display': 'block'
+        });
+
+        /****** MODERATOR TOOL FIXES ******/
+
+        // Add Moderator CP link to header (no way to verify if they have access or not that I know off)
+        //const MCP = `
+        //    <span style='padding:0 3px;'><a href="./mcp.php?i=main&amp;mode=front" title="Moderator Control Panel" role="menuitem">
+	//			<i class="icon fa-gavel fa-fw" aria-hidden="true" style='color:#3c4043;'></i>
+	//		</a></span>`;
+        //$('#FL-Wrapper').prepend(MCP);
+
         // Put the "leave shadow topic" and "lock topic" options back on the move topic page
         $('fieldset dd').css('margin-left', '5%');
         $('dd label').css('white-space', 'normal');
@@ -250,7 +262,7 @@
             'margin-bottom': '0px',
             'padding-left': '0px'
         });
-	$('.dropdown-contents a, .dropdown-contents').css('padding-left', '10px');
+        $('.dropdown-contents a, .dropdown-contents').css('padding-left', '10px');
         $('#phpbb .postbody .post-buttons .dropdown-container .dropdown-contents li').css('padding-left', '5px');
         $('.dropdown-contents a, .dropdown-contents li.dropdown-label').css('padding', '10px 10px 10px 0px');
     }
