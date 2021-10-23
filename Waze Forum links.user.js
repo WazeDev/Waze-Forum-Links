@@ -215,6 +215,9 @@
         $('#users-group-links > button').text('Go');
         $('#users-group-links > wz-select').css('width', '250px')
 
+        $('#viewprofile > section > div.bg2 > div > div > span:nth-child(2)').css('margin-right', '10px');
+        $('.mx-1.d-inline-block').css('margin', '0 5px 0 5px');
+
         /****** UCP USERGROUP TAB FIXES ******/
 
         // Fix the select when managing groups
@@ -247,11 +250,11 @@
         /****** MODERATOR TOOL FIXES ******/
 
         // Add Moderator CP link to header (no way to verify if they have access or not that I know off)
-        //const MCP = `
+        // const MCP = `
         //    <span style='padding:0 3px;'><a href="./mcp.php?i=main&amp;mode=front" title="Moderator Control Panel" role="menuitem">
 	//			<i class="icon fa-gavel fa-fw" aria-hidden="true" style='color:#3c4043;'></i>
 	//		</a></span>`;
-        //$('#FL-Wrapper').prepend(MCP);
+        // $('#FL-Wrapper').prepend(MCP);
 
         // Put the "leave shadow topic" and "lock topic" options back on the move topic page
         $('fieldset dd').css('margin-left', '5%');
@@ -265,6 +268,29 @@
         $('.dropdown-contents a, .dropdown-contents').css('padding-left', '10px');
         $('#phpbb .postbody .post-buttons .dropdown-container .dropdown-contents li').css('padding-left', '5px');
         $('.dropdown-contents a, .dropdown-contents li.dropdown-label').css('padding', '10px 10px 10px 0px');
+
+        /****** MARK FORUMS READ ******/
+        const HOST = window.location.href;
+        const FORUMNUM = HOST.search(/(f=[0-9]{1,3})/);
+
+        if (FORUMNUM !== -1) {
+            const MARKREAD = `<h5 class='forum-section-title wz-forums-grey-700'><a id='WFL-MarkRead' style='color:#55595e;'>Mark Forum(s) Read</a></h5>`;
+            let forumList = $('.row-wrp.forum-section-title-wrp').get();
+            $(forumList[0]).append(MARKREAD);
+
+            let topicLink = $('.mark-read').prop('href');
+            let temp = topicLink.replace("?", "&");
+            let temp2 = temp.split("&");
+            let hash, forum, mark_time;
+            for (let k = 0; k < temp2.length; k++) {
+                if (temp2[k].includes("hash=")) hash = temp2[k];
+                if (temp2[k].includes("f=")) forum = temp2[k];
+                if (temp2[k].includes("mark_time=")) mark_time = temp2[k];
+            }
+
+            let newURL = `https://www.waze.com/forum/viewforum.php?${hash}&${forum}&mark=forums&${mark_time}`;
+            $('#WFL-MarkRead').prop('href', newURL);
+        }
     }
 
     function main(tries = 1) {
