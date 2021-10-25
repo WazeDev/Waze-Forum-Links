@@ -1,15 +1,15 @@
 // ==UserScript==
 // @name            Waze Forum links
 // @namespace       https://github.com/WazeDev/
-// @version         2021.10.22.01
+// @version         2021.10.25.01
 // @description     Add profile and beta links in Waze forum
 // @author          WazeDev
 // @contributor     crazycaveman
 // @contributionURL https://github.com/WazeDev/Thank-The-Authors
 // @include         https://www.waze.com/forum/
-// @include         /^https:\/\/.*\.waze\.com\/forum.*/
-// @include         /^https:\/\/.*\.waze\.com\/forum\/(?!ucp\.php(?!\?i=(pm|166))).*/
+// @include         /^https:\/\/.*\.waze\.com\/forum\/*/
 // @grant           none
+// @require         https://code.jquery.com/jquery-2.2.4.min.js
 // @noframes
 // ==/UserScript==
 
@@ -66,6 +66,7 @@
     function loadSettings() {
         let defaults = {
             beta: { value: false, updated: 0 },
+            hash: ''
         };
         if (!localStorage) {
             return;
@@ -250,11 +251,11 @@
         /****** MODERATOR TOOL FIXES ******/
 
         // Add Moderator CP link to header (no way to verify if they have access or not that I know off)
-        // const MCP = `
+        //const MCP = `
         //    <span style='padding:0 3px;'><a href="./mcp.php?i=main&amp;mode=front" title="Moderator Control Panel" role="menuitem">
 	//			<i class="icon fa-gavel fa-fw" aria-hidden="true" style='color:#3c4043;'></i>
 	//		</a></span>`;
-        // $('#FL-Wrapper').prepend(MCP);
+        //$('#FL-Wrapper').prepend(MCP);
 
         // Put the "leave shadow topic" and "lock topic" options back on the move topic page
         $('fieldset dd').css('margin-left', '5%');
@@ -271,24 +272,31 @@
 
         /****** MARK FORUMS READ ******/
         const HOST = window.location.href;
-        const FORUMNUM = HOST.search(/(f=[0-9]{1,3})/);
+        const MARKREAD = `<h5 class='forum-section-title wz-forums-grey-700'><a id='WFL-MarkRead' style='color:#55595e;'>Mark Forum(s) Read</a></h5>`;
+        let forumList = $('.row-wrp.forum-section-title-wrp').get();
+        let time = `mark_time=${Date.now()}`;
+        let hash, forum;
 
-        if (FORUMNUM !== -1) {
-            const MARKREAD = `<h5 class='forum-section-title wz-forums-grey-700'><a id='WFL-MarkRead' style='color:#55595e;'>Mark Forum(s) Read</a></h5>`;
-            let forumList = $('.row-wrp.forum-section-title-wrp').get();
+        if (settings.hash || (!settings.hash && HOST.search(/(f=[0-9]{1,3})/) !== -1)) {
             $(forumList[0]).append(MARKREAD);
 
-            let topicLink = $('.mark-read').prop('href');
+            let topicLink = $('.mark-read').prop('href') ? $('.mark-read').prop('href') : HOST;
             let temp = topicLink.replace("?", "&");
             let temp2 = temp.split("&");
-            let hash, forum, mark_time;
+
             for (let k = 0; k < temp2.length; k++) {
                 if (temp2[k].includes("hash=")) hash = temp2[k];
                 if (temp2[k].includes("f=")) forum = temp2[k];
-                if (temp2[k].includes("mark_time=")) mark_time = temp2[k];
             }
+            if (settings.hash) {
+                hash = settings.hash;
+            } else if (settings.hash !== hash && hash) {
+                settings.hash = hash;
+                saveSettings();
+            }
+            if (!forum) forum = '';
 
-            let newURL = `https://www.waze.com/forum/viewforum.php?${hash}&${forum}&mark=forums&${mark_time}`;
+            let newURL = `https://www.waze.com/forum/viewforum.php?${hash}&${forum}&mark=forums&${time}`;
             $('#WFL-MarkRead').prop('href', newURL);
         }
     }
