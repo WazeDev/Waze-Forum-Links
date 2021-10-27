@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            Waze Forum links
 // @namespace       https://github.com/WazeDev/
-// @version         2021.10.26.02
+// @version         2021.10.27.01
 // @description     Add profile and beta links in Waze forum
 // @author          WazeDev
 // @contributor     crazycaveman
@@ -144,6 +144,8 @@
     }
 
     function SDGNewForumFixes() {
+         /****** DISPLAY NOTIFICATIONS ICON/NUMBER IN PAGE HEADER ******/
+
         // Create wrapper in header
         const FLWrapper = `<div id='FL-Wrapper'></div>`;
         $('#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel').prepend(FLWrapper);
@@ -166,11 +168,7 @@
             $('#FL-Notifications > a').css({ 'color': 'white' });
         }
 
-        // Move 'New' icon to front of text in notification page
-        $("#ucp > section > div.notifications-list > ul.cplist.two-columns > li > div.ml-6 > a > div > wz-badge").each(function() {
-            $(this).parent().prepend(this);
-        });
-
+         /****** ADD/FIX ITEMS IN HEADER DROP DOWN ******/
         // Change My Posts link to display topics (same as View Your Posts in old forum)
         $('#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel > wz-user-box > wz-menu-item:nth-child(5) > a').attr('href', 'https://www.waze.com/forum/search.php?author_id=16831039&sr=topics');
 
@@ -219,6 +217,25 @@
         $('#viewprofile > section > div.bg2 > div > div > span:nth-child(2)').css('margin-right', '10px');
         $('.mx-1.d-inline-block').css('margin', '0 5px 0 5px');
 
+        /****** UCP PRIVATE MESSAGES TAB FIXES ******/
+        // Fix spacing in the inbox
+        $('#viewfolder > section > div.waze-table-wrp > ul > li > dl > div > div').css('display', 'inline-block');
+        $('#viewfolder > section > div.waze-table-wrp > ul > li > dl > div > div > a').css('padding', '0 5px');
+        $('#viewfolder > section > div.waze-table-wrp > ul > li > dl > div.marked.ml-auto.mr-4.cursor-pointer.marked-msg-as-important-js').css('display', 'none');
+        $('#viewfolder > section > div.waze-table-wrp > ul > li > dl').css('justify-content', 'space-between');
+
+        // Fix spacing when reading a message
+        $('#viewfolder > section > div.bg-gray-100.rounded.pa-4.mb-6.pm.has-profile > div').css('align-items', 'normal');
+        $('#viewfolder > section > div.bg-gray-100.rounded.pa-4.mb-6.pm.has-profile > div > div.postbody > div.row-wrp > ul > li').css('padding', '0 2px');
+        $('#viewfolder > section > div.bg-gray-100.rounded.pa-4.mb-6.pm.has-profile > div > div.postbody > div.content').css({
+            'margin-top': '10px',
+            'padding': '15px 0',
+            'border-bottom': '1px solid #d5d7db'
+        });
+        $('#viewfolder > section > div.bg-gray-100.rounded.pa-4.mb-6.pm.has-profile > div > div.postbody > div.signature').css('margin-top', '0');
+        $('#viewfolder > section > div.bg-gray-100.rounded.pa-4.mb-6.pm.has-profile > div > div.bl.ml-4.pl-4.border-gray-300.wz-forums-grey-800.caption').css('border', 'none');
+        $('#viewfolder > section > div.bg-gray-100.rounded.pa-4.mb-6.pm.has-profile > div > div.bl.ml-4.pl-4.border-gray-300.wz-forums-grey-800.caption > div.has-profile-rank.no-avatar').css('margin-bottom', '5px');
+
         /****** UCP USERGROUP TAB FIXES ******/
 
         // Fix the select when managing groups
@@ -236,6 +253,13 @@
             text: 'Remove member from group'
         }));
 
+        // Adjust some spacing around the manage groups action area
+        $('#page-header > fieldset.display-actions').css('margin-bottom', '10px');
+        $('#page-header > fieldset.display-actions > select').css('margin-right', '20px');
+        $('#page-header > fieldset.display-actions > div').css('display', 'inline-block');
+        $('#page-header > fieldset.display-actions > div > a').css('padding', '0 5px 0 5px');
+        $('#usernames').css('border', '1px solid');
+
         // Fix spacing of text for usergroup descriptions and types
         $('#cp-main').css('max-width', '90%');
         $('.groups-row-wrp').css({
@@ -248,14 +272,27 @@
             'display': 'block'
         });
 
-        /****** MODERATOR TOOL FIXES ******/
+        /****** UCP NOTIFICATIONS TAB FIXES ******/
 
-        // Add Moderator CP link to header (no way to verify if they have access or not that I know off)
-        //const MCP = `
-        //    <span style='padding:0 3px;'><a href="./mcp.php?i=main&amp;mode=front" title="Moderator Control Panel" role="menuitem">
-	//			<i class="icon fa-gavel fa-fw" aria-hidden="true" style='color:#3c4043;'></i>
-	//		</a></span>`;
-        //$('#FL-Wrapper').prepend(MCP);
+        // Move 'New' icon to front of text in notification page
+        $("#ucp > section > div.notifications-list > ul.cplist.two-columns > li > div.ml-6 > a > div > wz-badge").each(function() {
+            $(this).parent().prepend(this);
+        });
+        $('#ucp > section > div.action-bar.bar-bottom.d-flex.justify-space-between.align-center > div > ul').css('list-style', 'none !important');
+        $('#ucp > section > div.action-bar.bar-bottom.d-flex.justify-space-between.align-center > div > ul > li').css({
+            'display': 'inline-block',
+            'vertical-align': 'middle',
+            'line-height': 'normal',
+            'padding': '5px 3px 5px 0',
+            'font-size': '12px'
+        });
+
+        // Clean up some display issues
+        $('#ucp > section > div.action-bar.bar-bottom.d-flex.justify-space-between.align-center > div > ul > li.active').css({'color': '#09f', 'font-weight': '400', 'line-height': '1.4'});
+        $('#ucp > section > div.action-bar.bar-bottom.d-flex.justify-space-between.align-center > div > ul > li > a').css('padding', '0');
+        $('#ucp > section > div.action-bar.bar-bottom.d-flex.justify-space-between.align-center > div > ul > li.arrow.previous > a > i').css({'color': '#09f', 'font-size': '12px'});
+
+        /****** MODERATOR TOOL FIXES ******/
 
         // Put the "leave shadow topic" and "lock topic" options back on the move topic page
         $('fieldset dd').css('margin-left', '5%');
