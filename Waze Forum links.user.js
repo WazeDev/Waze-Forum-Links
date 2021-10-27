@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            Waze Forum links
 // @namespace       https://github.com/WazeDev/
-// @version         2021.10.27.01
+// @version         2021.10.27.02
 // @description     Add profile and beta links in Waze forum
 // @author          WazeDev
 // @contributor     crazycaveman
@@ -236,6 +236,13 @@
         $('#viewfolder > section > div.bg-gray-100.rounded.pa-4.mb-6.pm.has-profile > div > div.bl.ml-4.pl-4.border-gray-300.wz-forums-grey-800.caption').css('border', 'none');
         $('#viewfolder > section > div.bg-gray-100.rounded.pa-4.mb-6.pm.has-profile > div > div.bl.ml-4.pl-4.border-gray-300.wz-forums-grey-800.caption > div.has-profile-rank.no-avatar').css('margin-bottom', '5px');
 
+        // Composing a PM
+        $('#pmheader-postingbox > section > div.column2').css('display', 'none');
+        $('#pmheader-postingbox > section > div.column1').css('width', '50%');
+        $('#pmheader-postingbox > section > div:nth-child(2) > dl > dt').css({'width': '50%', 'display': 'inline-block', 'float': 'left'});
+        $('#pmheader-postingbox > section > div:nth-child(2) > dl > dd').css({'flex-direction': 'column', 'padding': '25px 0 0 20px'});
+        $('#pmheader-postingbox > section > div:nth-child(2) > dl > dd > div').css({'align-items': 'flex-start', 'flex-direction': 'column'});
+
         /****** UCP USERGROUP TAB FIXES ******/
 
         // Fix the select when managing groups
@@ -307,6 +314,21 @@
         $('#phpbb .postbody .post-buttons .dropdown-container .dropdown-contents li').css('padding-left', '5px');
         $('.dropdown-contents a, .dropdown-contents li.dropdown-label').css('padding', '10px 10px 10px 0px');
 
+        // Main
+        $('#cp-main.cp-main.mcp-main.panel-container > form').css('margin-left', '10px');
+        $('#cp-main.cp-main.mcp-main.panel-container > div').css('margin-left', '10px');
+
+        // Reported Messages tab
+        $('#mcp > div').css('margin-left', '10%');
+
+        // Clean up User Notes tab
+        $('#mcp > div').css('margin-left', '10px');
+        $('#mcp > div > div > fieldset > dl > dd:nth-child(2)').css('width', '50%');
+        $('#mcp > div > div > fieldset > dl > dd:nth-child(3)').css('width', '15%');
+
+        // Clean up the Moderator Logs tab
+        $('#mcp > div > div > div.action-bar.bar-top').css({'display': 'block', 'margin-bottom': '10px'});
+        $('#mcp > div > div > div.action-bar.bar-top > input.inputbox.autowidth').css({'margin': '0 5px', 'border': '1px solid grey'});
         /****** MARK FORUMS READ ******/
         const HOST = window.location.href;
         const MARKREAD = `<h5 class='forum-section-title wz-forums-grey-700'><a id='WFL-MarkRead' style='color:#55595e;'>Mark All Subforums Read</a></h5>`;
@@ -371,3 +393,4 @@
 
     main();
 }());
+
