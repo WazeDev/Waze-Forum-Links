@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            Waze Forum links
 // @namespace       https://github.com/WazeDev/
-// @version         2021.10.27.02
+// @version         2021.11.15.01
 // @description     Add profile and beta links in Waze forum
 // @author          WazeDev
 // @contributor     crazycaveman
@@ -340,11 +340,6 @@
         let hash, forum;
 
         if (settings.hash || (!settings.hash && HOST.search(/(f=[0-9]{1,3})/) !== -1)) {
-            $(forumList[0]).append(MARKREAD);
-            $(forumList[1]).append(MARKREAD1);
-            $(forumList[2]).append(MARKREAD2);
-            $(forumList[3]).append(MARKREAD3);
-
             let topicLink = $('.mark-read').prop('href') ? $('.mark-read').prop('href') : HOST;
             let temp = topicLink.replace("?", "&");
             let temp2 = temp.split("&");
@@ -353,22 +348,30 @@
                 if (temp2[k].includes("hash=")) hash = temp2[k];
                 if (temp2[k].includes("f=")) forum = temp2[k];
             }
-            if (settings.hash) {
-                hash = settings.hash;
-            } else if (settings.hash !== hash && hash) {
+            if (hash && settings.hash !== hash) {
                 settings.hash = hash;
                 saveSettings();
-            }
+            } else if (!hash && !settings.hash) { return; }
+
             if (!forum) forum = '';
 
             let newURL = `https://www.waze.com/forum/viewforum.php?${hash}&${forum}&mark=forums&${time}`;
             let newURL1 = `https://www.waze.com/forum/viewforum.php?${hash}&f=659&mark=forums&${time}`;
             let newURL2 = `https://www.waze.com/forum/viewforum.php?${hash}&f=663&mark=forums&${time}`;
             let newURL3 = `https://www.waze.com/forum/viewforum.php?${hash}&f=1155&mark=forums&${time}`;
+            $(forumList[0]).append(MARKREAD);
+            if (HOST.search(/(f=[0-9]{1,3})/) === -1) {
+                $(forumList[1]).append(MARKREAD1);
+                $(forumList[2]).append(MARKREAD2);
+                $(forumList[3]).append(MARKREAD3);
+            }
+
             $('#WFL-MarkRead').prop('href', newURL);
-            $('#WFL-MarkRead1').prop('href', newURL1);
-            $('#WFL-MarkRead2').prop('href', newURL2);
-            $('#WFL-MarkRead3').prop('href', newURL3);
+            if (HOST.search(/(f=[0-9]{1,3})/) === -1) {
+                $('#WFL-MarkRead1').prop('href', newURL1);
+                $('#WFL-MarkRead2').prop('href', newURL2);
+                $('#WFL-MarkRead3').prop('href', newURL3);
+            }
         }
     }
 
