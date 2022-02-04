@@ -341,7 +341,7 @@
 			    </wz-button>
 		    </a>`;
         const MARKFORUMS = `<a href="" class="no-blue-link" id="WFL-markForums"><h5 class="forum-section-title wz-forums-grey-700" title="Mark all forums read">Mark All Forums Read</h5></a>`;
-        const MARKSUBFORUMS = `<a href="" class="no-blue-link" id="WFL-markSubForums><h5 class="forum-section-title wz-forums-grey-700" title="Mark all sub-forums read">Mark Sub-Forums Read</h5></a>`;
+        const MARKSUBFORUMS = `<a href="" class="no-blue-link" id="WFL-markSubForums"><h5 class="forum-section-title wz-forums-grey-700" title="Mark all sub-forums read">Mark Sub-Forums Read</h5></a>`;
         let forumList = $('.row-wrp.forum-section-title-wrp').get();
         let topicList = $('h5.forum-section-title.wz-forums-grey-700.d-flex.align-center').get();
         let time = `mark_time=${Date.now()}`;
