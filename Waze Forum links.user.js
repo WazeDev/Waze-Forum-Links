@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            Waze Forum links
 // @namespace       https://github.com/WazeDev/
-// @version         2021.11.15.01
+// @version         2022.02.04.01
 // @description     Add profile and beta links in Waze forum
 // @author          WazeDev
 // @contributor     crazycaveman
@@ -329,13 +329,21 @@
         // Clean up the Moderator Logs tab
         $('#mcp > div > div > div.action-bar.bar-top').css({'display': 'block', 'margin-bottom': '10px'});
         $('#mcp > div > div > div.action-bar.bar-top > input.inputbox.autowidth').css({'margin': '0 5px', 'border': '1px solid grey'});
+    }
+
+    function markRead() {
         /****** MARK FORUMS READ ******/
         const HOST = window.location.href;
-        const MARKREAD = `<h5 class='forum-section-title wz-forums-grey-700'><a id='WFL-MarkRead' style='color:#55595e;'>Mark All Subforums Read</a></h5>`;
-        const MARKREAD1 = `<h5 class='forum-section-title wz-forums-grey-700'><a id='WFL-MarkRead1' style='color:#55595e;'>Mark Waze Products Forums Read</a></h5>`;
-        const MARKREAD2 = `<h5 class='forum-section-title wz-forums-grey-700'><a id='WFL-MarkRead2' style='color:#55595e;'>Mark Community Forums Read</a></h5>`;
-        const MARKREAD3 = `<h5 class='forum-section-title wz-forums-grey-700'><a id='WFL-MarkRead3' style='color:#55595e;'>Mark Formal Mentoring Forums Read</a></h5>`;
+        const MARKTOPICS = `
+            <a class="no-underline" href="" title="Mark all topics read" id="WFL-markTopics">
+			    <wz-button class="ml-4" size="sm">
+				    Mark Topics Read
+			    </wz-button>
+		    </a>`;
+        const MARKFORUMS = `<a href="" class="no-blue-link" id="WFL-markForums"><h5 class="forum-section-title wz-forums-grey-700" title="Mark all forums read">Mark All Forums Read</h5></a>`;
+        const MARKSUBFORUMS = `<a href="" class="no-blue-link" id="WFL-markSubForums><h5 class="forum-section-title wz-forums-grey-700" title="Mark all sub-forums read">Mark Sub-Forums Read</h5></a>`;
         let forumList = $('.row-wrp.forum-section-title-wrp').get();
+        let topicList = $('h5.forum-section-title.wz-forums-grey-700.d-flex.align-center').get();
         let time = `mark_time=${Date.now()}`;
         let hash, forum;
 
@@ -343,6 +351,7 @@
             let topicLink = $('.mark-read').prop('href') ? $('.mark-read').prop('href') : HOST;
             let temp = topicLink.replace("?", "&");
             let temp2 = temp.split("&");
+            hash = settings.hash;
 
             for (let k = 0; k < temp2.length; k++) {
                 if (temp2[k].includes("hash=")) hash = temp2[k];
@@ -355,22 +364,23 @@
 
             if (!forum) forum = '';
 
-            let newURL = `https://www.waze.com/forum/viewforum.php?${hash}&${forum}&mark=forums&${time}`;
-            let newURL1 = `https://www.waze.com/forum/viewforum.php?${hash}&f=659&mark=forums&${time}`;
-            let newURL2 = `https://www.waze.com/forum/viewforum.php?${hash}&f=663&mark=forums&${time}`;
-            let newURL3 = `https://www.waze.com/forum/viewforum.php?${hash}&f=1155&mark=forums&${time}`;
-            $(forumList[0]).append(MARKREAD);
-            if (HOST.search(/(f=[0-9]{1,3})/) === -1) {
-                $(forumList[1]).append(MARKREAD1);
-                $(forumList[2]).append(MARKREAD2);
-                $(forumList[3]).append(MARKREAD3);
-            }
+            let topicURL = `https://www.waze.com/forum/viewforum.php?${hash}&${forum}&mark=topics&${time}`;
+            let forumURL = `https://www.waze.com/forum/viewforum.php?${hash}&mark=forums&${time}`;
+            let subforumURL = `https://www.waze.com/forum/viewforum.php?${hash}&${forum}&mark=forums&${time}`;
 
-            $('#WFL-MarkRead').prop('href', newURL);
             if (HOST.search(/(f=[0-9]{1,3})/) === -1) {
-                $('#WFL-MarkRead1').prop('href', newURL1);
-                $('#WFL-MarkRead2').prop('href', newURL2);
-                $('#WFL-MarkRead3').prop('href', newURL3);
+                $(forumList[0]).append(MARKFORUMS);
+                $('#WFL-markForums').prop('href', forumURL);
+            } else {
+                if(forumList.length > 0) {
+                    $(forumList[0]).append(MARKSUBFORUMS);
+                    $('#WFL-markSubForums').prop('href', subforumURL);
+                }
+                if(topicList.length > 0){
+                    $(topicList[0]).append(MARKTOPICS);
+                    $('#WFL-markTopics').prop('href', topicURL);
+                }
+
             }
         }
     }
@@ -390,10 +400,10 @@
         WMEProfiles();
         checkBetaUser();
         SDGNewForumFixes();
+        markRead();
         log('Done', cl.i);
         console.groupEnd('WMEFL');
     }
 
     main();
 }());
-
