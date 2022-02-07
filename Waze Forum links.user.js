@@ -1,15 +1,15 @@
 // ==UserScript==
 // @name            Waze Forum links
 // @namespace       https://github.com/WazeDev/
-// @version         2021.07.06.01
+// @version         2022.02.04.01
 // @description     Add profile and beta links in Waze forum
 // @author          WazeDev
 // @contributor     crazycaveman
 // @contributionURL https://github.com/WazeDev/Thank-The-Authors
 // @include         https://www.waze.com/forum/
-// @include         /^https:\/\/.*\.waze\.com\/forum.*/
-// @include         /^https:\/\/.*\.waze\.com\/forum\/(?!ucp\.php(?!\?i=(pm|166))).*/
+// @include         /^https:\/\/.*\.waze\.com\/forum\/*/
 // @grant           none
+// @require         https://code.jquery.com/jquery-2.2.4.min.js
 // @noframes
 // ==/UserScript==
 
@@ -66,6 +66,7 @@
     function loadSettings() {
         let defaults = {
             beta: { value: false, updated: 0 },
+            hash: ''
         };
         if (!localStorage) {
             return;
@@ -142,26 +143,35 @@
         });
     }
 
-    function haveNotifications() {
-       const numNotifications = $('#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel > wz-user-box > wz-menu-item:nth-child(4) > a > strong').text();
+    function SDGNewForumFixes() {
+         /****** DISPLAY NOTIFICATIONS ICON/NUMBER IN PAGE HEADER ******/
 
+        // Create wrapper in header
+        const FLWrapper = `<div id='FL-Wrapper'></div>`;
+        $('#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel').prepend(FLWrapper);
+
+        // Create notification icon in header
+        const numNotifications = $('#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel > wz-user-box > wz-menu-item:nth-child(4) > a > strong').text();
         if (parseInt(numNotifications) > 0) {
-            $('#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel').prepend(
-                `<span id='WFL-Notifications'><a href='https://www.waze.com/forum/ucp.php?i=ucp_notifications' style='text-decoration:none;color:black;'>${numNotifications}</a></span>`
+            $('#FL-Wrapper').prepend(
+                `<span id='FL-Notifications'><a href='https://www.waze.com/forum/ucp.php?i=ucp_notifications' style='text-decoration:none;color:black;'>${numNotifications}</a></span>`
             );
-            $('#WFL-Notifications').css({
+            $('#FL-Notifications').css({
                 'float': 'left',
                 'margin-right': '80px',
                 'padding': '0px 10px',
                 'border': '2px solid black',
                 'border-radius': '50%',
-                'background-color': '#40ff00',
+                'background-color': '#33ccff',
                 'font-size': '18px'
             });
+            $('#FL-Notifications > a').css({ 'color': 'white' });
         }
-    }
 
-    function SDGNewForumFixes() {
+         /****** ADD/FIX ITEMS IN HEADER DROP DOWN ******/
+        // Change My Posts link to display topics (same as View Your Posts in old forum)
+        $('#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel > wz-user-box > wz-menu-item:nth-child(5) > a').attr('href', 'https://www.waze.com/forum/search.php?author_id=16831039&sr=topics');
+
         // Re-enable memberlist button in dropdown
         const $MemberList =
             `<wz-menu-item >
@@ -170,23 +180,23 @@
                 </a>
             </wz-menu-item>`;
         $('#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel > wz-user-box > wz-menu-item:nth-child(6)').after($MemberList);
-        $("#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel > wz-user-box > wz-menu-item:nth-child(7) > a").click(function() {
+        $("#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel > wz-user-box > wz-menu-item:nth-child(8) > a").click(function() {
             window.location = './memberlist.php';
         });
 
-        // Change My Posts link to display topics (same as View Your Posts in old forum)
-        $('#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel > wz-user-box > wz-menu-item:nth-child(5) > a').attr('href', function(i,link) {
-            return link.replace(/sr=posts/,'sr=topics');
+        // Add link to usergroups page to dropdown
+        const $UserGroups =
+            `<wz-menu-item >
+                <a class="no-blue-link" href="https://www.waze.com/forum/ucp.php?i=167" title="Usergroups" role="menuitem">
+                    <i class="icon fa-group fa-fw"></i><span>Usergroups</span>
+                </a>
+            </wz-menu-item>`;
+        $('#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel > wz-user-box > wz-menu-item:nth-child(6)').after($UserGroups);
+        $("#control_bar_handler > div.header-waze-wrapper > wz-header > wz-header-user-panel > wz-user-box > wz-menu-item:nth-child(7) > a").click(function() {
+            window.location = 'https://www.waze.com/forum/ucp.php?i=167';
         });
 
-        // Copy forum path to bottom of page
-        //let topicLink = $('#control_bar_handler > div.wrap').clone();
-        // $('#page-body > div.d-flex.justify-space-between.mb-5').before(topicLink);
-
-        // Move 'New' icon to front of text in notification page
-        $("#ucp > section > div.notifications-list > ul.cplist.two-columns > li > div.ml-6 > a > div > wz-badge").each(function() {
-            $(this).parent().prepend(this);
-        });
+        /****** USER PROFILE PAGE ELEMENT FIXES AND ADDTITIONS ******/
 
         // Move link to PM a user to the top left of the user page
         let $newli = $('#page-body > main > aside > ul > li:nth-child(2)').clone();
@@ -195,15 +205,193 @@
         $($newli.find('span')[0]).text('Send PM');
         $($newli.find('span')[0]).css('padding-left', '5px');
         $('#page-body > main > aside > ul').prepend($newli);
+
+        // Change the usergroup list to a select again...
+        $('#members-groups-list').hide();
+        $('#users-group-links').css('display', 'inline-block');
+        $('#users-group-links > wz-select').css('display', 'inline-block');
+        $('#users-group-links > button').css('display', 'inline-block');
+        $('#users-group-links > button').text('Go');
+        $('#users-group-links > wz-select').css('width', '250px')
+
+        $('#viewprofile > section > div.bg2 > div > div > span:nth-child(2)').css('margin-right', '10px');
+        $('.mx-1.d-inline-block').css('margin', '0 5px 0 5px');
+
+        /****** UCP PRIVATE MESSAGES TAB FIXES ******/
+        // Fix spacing in the inbox
+        $('#viewfolder > section > div.waze-table-wrp > ul > li > dl > div > div').css('display', 'inline-block');
+        $('#viewfolder > section > div.waze-table-wrp > ul > li > dl > div > div > a').css('padding', '0 5px');
+        $('#viewfolder > section > div.waze-table-wrp > ul > li > dl > div.marked.ml-auto.mr-4.cursor-pointer.marked-msg-as-important-js').css('display', 'none');
+        $('#viewfolder > section > div.waze-table-wrp > ul > li > dl').css('justify-content', 'space-between');
+
+        // Fix spacing when reading a message
+        $('#viewfolder > section > div.bg-gray-100.rounded.pa-4.mb-6.pm.has-profile > div').css('align-items', 'normal');
+        $('#viewfolder > section > div.bg-gray-100.rounded.pa-4.mb-6.pm.has-profile > div > div.postbody > div.row-wrp > ul > li').css('padding', '0 2px');
+        $('#viewfolder > section > div.bg-gray-100.rounded.pa-4.mb-6.pm.has-profile > div > div.postbody > div.content').css({
+            'margin-top': '10px',
+            'padding': '15px 0',
+            'border-bottom': '1px solid #d5d7db'
+        });
+        $('#viewfolder > section > div.bg-gray-100.rounded.pa-4.mb-6.pm.has-profile > div > div.postbody > div.signature').css('margin-top', '0');
+        $('#viewfolder > section > div.bg-gray-100.rounded.pa-4.mb-6.pm.has-profile > div > div.bl.ml-4.pl-4.border-gray-300.wz-forums-grey-800.caption').css('border', 'none');
+        $('#viewfolder > section > div.bg-gray-100.rounded.pa-4.mb-6.pm.has-profile > div > div.bl.ml-4.pl-4.border-gray-300.wz-forums-grey-800.caption > div.has-profile-rank.no-avatar').css('margin-bottom', '5px');
+
+        // Composing a PM
+        $('#pmheader-postingbox > section > div.column2').css('display', 'none');
+        $('#pmheader-postingbox > section > div.column1').css('width', '50%');
+        $('#pmheader-postingbox > section > div:nth-child(2) > dl > dt').css({'width': '50%', 'display': 'inline-block', 'float': 'left'});
+        $('#pmheader-postingbox > section > div:nth-child(2) > dl > dd').css({'flex-direction': 'column', 'padding': '25px 0 0 20px'});
+        $('#pmheader-postingbox > section > div:nth-child(2) > dl > dd > div').css({'align-items': 'flex-start', 'flex-direction': 'column'});
+
+        /****** UCP USERGROUP TAB FIXES ******/
+
+        // Fix the select when managing groups
+        const userSelect = $('#page-header > fieldset.display-actions > select').get();
+        $(userSelect).append($('<option>', {
+            value: 'default',
+            text: 'Make group default for member'
+        }));
+        $(userSelect).append($('<option>', {
+            value: 'approve',
+            text: 'Approve member'
+        }));
+        $(userSelect).append($('<option>', {
+            value: 'deleteusers',
+            text: 'Remove member from group'
+        }));
+
+        // Adjust some spacing around the manage groups action area
+        $('#page-header > fieldset.display-actions').css('margin-bottom', '10px');
+        $('#page-header > fieldset.display-actions > select').css('margin-right', '20px');
+        $('#page-header > fieldset.display-actions > div').css('display', 'inline-block');
+        $('#page-header > fieldset.display-actions > div > a').css('padding', '0 5px 0 5px');
+        $('#usernames').css('border', '1px solid');
+
+        // Fix spacing of text for usergroup descriptions and types
+        $('#cp-main').css('max-width', '90%');
+        $('.groups-row-wrp').css({
+            'width': '80%'
+        });
+        $('.groups-row-wrp > div > span').css({
+            'display': 'block'
+        });
+        $('.row-wrp > wz-radio-button > span').css({
+            'display': 'block'
+        });
+
+        /****** UCP NOTIFICATIONS TAB FIXES ******/
+
+        // Move 'New' icon to front of text in notification page
+        $("#ucp > section > div.notifications-list > ul.cplist.two-columns > li > div.ml-6 > a > div > wz-badge").each(function() {
+            $(this).parent().prepend(this);
+        });
+        $('#ucp > section > div.action-bar.bar-bottom.d-flex.justify-space-between.align-center > div > ul').css('list-style', 'none !important');
+        $('#ucp > section > div.action-bar.bar-bottom.d-flex.justify-space-between.align-center > div > ul > li').css({
+            'display': 'inline-block',
+            'vertical-align': 'middle',
+            'line-height': 'normal',
+            'padding': '5px 3px 5px 0',
+            'font-size': '12px'
+        });
+
+        // Clean up some display issues
+        $('#ucp > section > div.action-bar.bar-bottom.d-flex.justify-space-between.align-center > div > ul > li.active').css({'color': '#09f', 'font-weight': '400', 'line-height': '1.4'});
+        $('#ucp > section > div.action-bar.bar-bottom.d-flex.justify-space-between.align-center > div > ul > li > a').css('padding', '0');
+        $('#ucp > section > div.action-bar.bar-bottom.d-flex.justify-space-between.align-center > div > ul > li.arrow.previous > a > i').css({'color': '#09f', 'font-size': '12px'});
+
+        /****** MODERATOR TOOL FIXES ******/
+
+        // Put the "leave shadow topic" and "lock topic" options back on the move topic page
+        $('fieldset dd').css('margin-left', '5%');
+        $('dd label').css('white-space', 'normal');
+
+        // Remove excess space in post actions menu for moderator functions
+        $('.post-buttons .dropdown a').css({
+            'margin-bottom': '0px',
+            'padding-left': '0px'
+        });
+        $('.dropdown-contents a, .dropdown-contents').css('padding-left', '10px');
+        $('#phpbb .postbody .post-buttons .dropdown-container .dropdown-contents li').css('padding-left', '5px');
+        $('.dropdown-contents a, .dropdown-contents li.dropdown-label').css('padding', '10px 10px 10px 0px');
+
+        // Main
+        $('#cp-main.cp-main.mcp-main.panel-container > form').css('margin-left', '10px');
+        $('#cp-main.cp-main.mcp-main.panel-container > div').css('margin-left', '10px');
+
+        // Reported Messages tab
+        $('#mcp > div').css('margin-left', '10%');
+
+        // Clean up User Notes tab
+        $('#mcp > div').css('margin-left', '10px');
+        $('#mcp > div > div > fieldset > dl > dd:nth-child(2)').css('width', '50%');
+        $('#mcp > div > div > fieldset > dl > dd:nth-child(3)').css('width', '15%');
+
+        // Clean up the Moderator Logs tab
+        $('#mcp > div > div > div.action-bar.bar-top').css({'display': 'block', 'margin-bottom': '10px'});
+        $('#mcp > div > div > div.action-bar.bar-top > input.inputbox.autowidth').css({'margin': '0 5px', 'border': '1px solid grey'});
+    }
+
+    function markRead() {
+        /****** MARK FORUMS READ ******/
+        const HOST = window.location.href;
+        const MARKTOPICS = `
+            <a class="no-underline" href="" title="Mark all topics read" id="WFL-markTopics">
+			    <wz-button class="ml-4" size="sm">
+				    Mark Topics Read
+			    </wz-button>
+		    </a>`;
+        const MARKFORUMS = `<a href="" class="no-blue-link" id="WFL-markForums"><h5 class="forum-section-title wz-forums-grey-700" title="Mark all forums read">Mark All Forums Read</h5></a>`;
+        const MARKSUBFORUMS = `<a href="" class="no-blue-link" id="WFL-markSubForums"><h5 class="forum-section-title wz-forums-grey-700" title="Mark all sub-forums read">Mark Sub-Forums Read</h5></a>`;
+        let forumList = $('.row-wrp.forum-section-title-wrp').get();
+        let topicList = $('h5.forum-section-title.wz-forums-grey-700.d-flex.align-center').get();
+        let time = `mark_time=${Date.now()}`;
+        let hash, forum;
+
+        if (settings.hash || (!settings.hash && HOST.search(/(f=[0-9]{1,3})/) !== -1)) {
+            let topicLink = $('.mark-read').prop('href') ? $('.mark-read').prop('href') : HOST;
+            let temp = topicLink.replace("?", "&");
+            let temp2 = temp.split("&");
+            hash = settings.hash;
+
+            for (let k = 0; k < temp2.length; k++) {
+                if (temp2[k].includes("hash=")) hash = temp2[k];
+                if (temp2[k].includes("f=")) forum = temp2[k];
+            }
+            if (hash && settings.hash !== hash) {
+                settings.hash = hash;
+                saveSettings();
+            } else if (!hash && !settings.hash) { return; }
+
+            if (!forum) forum = '';
+
+            let topicURL = `https://www.waze.com/forum/viewforum.php?${hash}&${forum}&mark=topics&${time}`;
+            let forumURL = `https://www.waze.com/forum/viewforum.php?${hash}&mark=forums&${time}`;
+            let subforumURL = `https://www.waze.com/forum/viewforum.php?${hash}&${forum}&mark=forums&${time}`;
+
+            if (HOST.search(/(f=[0-9]{1,3})/) === -1) {
+                $(forumList[0]).append(MARKFORUMS);
+                $('#WFL-markForums').prop('href', forumURL);
+            } else {
+                if(forumList.length > 0) {
+                    $(forumList[0]).append(MARKSUBFORUMS);
+                    $('#WFL-markSubForums').prop('href', subforumURL);
+                }
+                if(topicList.length > 0){
+                    $(topicList[0]).append(MARKTOPICS);
+                    $('#WFL-markTopics').prop('href', topicURL);
+                }
+
+            }
+        }
     }
 
     function main(tries = 1) {
-        if (tries >= 20) {
+        if (tries >= 10) {
             log('Giving up on loading', cl.w);
             return;
         } else if (!($ && document.readyState === 'complete')) {
             log('Document not ready, waiting', cl.d);
-            setTimeout(main, 250, tries + 1);
+            setTimeout(main, 500, tries + 1);
             return;
         }
         console.group('WMEFL');
@@ -211,8 +399,8 @@
         loadSettings();
         WMEProfiles();
         checkBetaUser();
-        haveNotifications();
         SDGNewForumFixes();
+        markRead();
         log('Done', cl.i);
         console.groupEnd('WMEFL');
     }
